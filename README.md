@@ -7,6 +7,7 @@ You want to create an AWS Lambda function that can fetch data from an API period
 * Create an AWS Lambda function and configure it to be triggered by an Amazon CloudWatch Event that occurs every 15 seconds.
 * In the function's code, use the urllib library to make a GET request to the API to fetch the data.
 * Use a library such as mysql to connect to the Amazon RDS instance and store the data in the database.
+* Deploy the function to run indefinitely, continuing to fetch and store the data on a regular basis.
 
 # Services used
 * AWS Lambda: Lambda is a computing service that allows programmers to run code without creating or managing servers.
