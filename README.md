@@ -84,9 +84,9 @@ CREATE TABLE IF NOT EXISTS iss_position (
 ## 📂 Project Structure
 iss-tracker-lambda/
 │
-├── lambda_function.py       # Main Lambda logic
-├── README.md                # Project documentation
-├── screenshots/             # (Optional) Architecture diagrams and logs
+- ├── lambda_function.py       # Main Lambda logic
+- ├── README.md                # Project documentation
+- ├── screenshots/             # (Optional) Architecture diagrams and logs
 
 --
 
