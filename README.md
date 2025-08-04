@@ -156,8 +156,6 @@ iss-tracker-lambda/
 
 ### 📊 Screenshots / Diagram
 - **Folder:** `screenshots/`
-- Include architecture diagram.
-- Add example database output (e.g., screenshot from pgAdmin or DBeaver showing table data).
 
 ---
 
