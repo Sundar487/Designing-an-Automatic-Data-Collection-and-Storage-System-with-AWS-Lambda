@@ -33,6 +33,9 @@ To build a production-like, serverless architecture in AWS that:
 
 ## 🏗️ Architecture Overview
 
+<img width="1431" height="1121" alt="aws lambda rds drawio" src="https://github.com/user-attachments/assets/39bbc5e4-b571-4f61-95b9-3a17c6733fa6" />
+
+
 - Custom VPC with 3 subnets (2 public, 1 private)
 
 - Internet Gateway (IGW) is attached to the VPC
