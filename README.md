@@ -31,7 +31,7 @@ To build a production-like, serverless architecture in AWS that:
 
 ---
 
-🏗️ Architecture Overview
+## 🏗️ Architecture Overview
 
 - Custom VPC with 3 subnets (2 public, 1 private)
 
@@ -53,7 +53,9 @@ Route Tables are created:
 
 - Lambda function fetches ISS data and stores it into PostgreSQL
 
-🛠️ Tech Stack
+--
+
+## 🛠️ Tech Stack
 
 | Tool/Service    | Purpose                                            |
 |-----------------|----------------------------------------------------|
@@ -65,21 +67,10 @@ Route Tables are created:
 | EventBridge     | Scheduled trigger every 1 minute                   |
 | urllib          | Fetches data from public ISS tracking API          |
 | psycopg2        | Python PostgreSQL connector                        |
+	
+--
 
-Tool/Service	Purpose
-	
-	
-	
-	
-	
-	
-psycopg2	
-	
-
-🧱 Database Schema
-sql
-Copy
-Edit
+## 🧱 Database Schema
 CREATE TABLE IF NOT EXISTS iss_position (
   id SERIAL PRIMARY KEY,
   latitude INTEGER,
@@ -87,93 +78,95 @@ CREATE TABLE IF NOT EXISTS iss_position (
   timestamp INTEGER,
   message VARCHAR(255)
 );
-📂 Project Structure
-python
-Copy
-Edit
+
+--
+
+## 📂 Project Structure
 iss-tracker-lambda/
 │
 ├── lambda_function.py       # Main Lambda logic
-├── rds_schema.sql           # Optional table schema
 ├── README.md                # Project documentation
 ├── screenshots/             # (Optional) Architecture diagrams and logs
-🔁 Data Flow
-📥 Extract
-EventBridge triggers the Lambda function every 1 minute
 
-Lambda uses urllib to call the public ISS API:
-http://api.open-notify.org/iss-now.json
+--
 
-🔧 Transform
-Extracts fields: latitude, longitude, timestamp, message
+## 🔁 Data Flow
 
-Ensures table exists in RDS before inserting
+### 📥 Extract
+- EventBridge triggers the Lambda function every 1 minute
+- Lambda uses urllib to call the public ISS API:
+- http://api.open-notify.org/iss-now.json
 
-📤 Load
-Inserts each new row into the iss_position table in RDS PostgreSQL
+### 🔧 Transform
+- Extracts fields: latitude, longitude, timestamp, message
+- Ensures table exists in RDS before inserting
 
-🔐 VPC & Network Design
-Component	Configuration
-VPC	Custom VPC in ap-south-1 (Mumbai)
-Subnets	2 Public + 1 Private
-Internet Gateway	Attached to VPC, used by public subnets
-NAT Gateway	Deployed in public subnet for Lambda internet access
-Route Tables	Private → NAT GW, Public → IGW
-Lambda	Runs inside private subnet
-RDS PostgreSQL	Hosted inside private subnet
-Security Groups	Allow Lambda → RDS on port 5432
+### 📤 Load
+- Inserts each new row into the iss_position table in RDS PostgreSQL
 
-⚙️ Deployment Steps
-Create a custom VPC with 3 subnets:
+--- 
 
-2 public subnets
+## 🔐 VPC & Network Design
 
-1 private subnet
+| Component        | Purpose / Configuration                                             |
+| ---------------- | ------------------------------------------------------------------- |
+| VPC              | Custom VPC created in ap-south-1 (Mumbai) region                    |
+| Subnets          | 2 Public subnets and 1 Private subnet                               |
+| Internet Gateway | Attached to VPC for public subnet internet access                   |
+| NAT Gateway      | In public subnet to allow private subnet to access the internet     |
+| Route Tables     | Public subnets → IGW<br>Private subnet → NAT Gateway                |
+| Lambda           | Deployed inside private subnet (no public IP)                       |
+| RDS PostgreSQL   | Hosted inside private subnet (not publicly exposed to the internet) |
+| Security Groups  | Allows Lambda to access RDS on port 5432                            |
 
-Attach an Internet Gateway to the VPC
 
-Create a NAT Gateway in one of the public subnets
+### ⚙️ Deployment Steps
+### Create a custom VPC with 3 subnets
+- 2 Public subnets
+- 1 Private subnet
 
-Create 2 route tables:
+### Attach an Internet Gateway to the VPC
+- Enables public subnet connectivity to the internet.
 
-Public subnets → 0.0.0.0/0 via Internet Gateway
+### Create a NAT Gateway in one of the public subnets
+- Allows private subnet resources (Lambda) to make outbound internet calls.
 
-Private subnet → 0.0.0.0/0 via NAT Gateway
+### Create 2 Route Tables
+- Public subnets → 0.0.0.0/0 via Internet Gateway
+- Private subnet → 0.0.0.0/0 via NAT Gateway
 
-Launch Amazon RDS PostgreSQL in the private subnet
+### Launch Amazon RDS PostgreSQL in the private subnet
+- Disable public access.
 
-Deploy the Lambda function in the private subnet
+### Deploy the Lambda function in the private subnet
+- Attach to the same VPC as the RDS instance.
 
-Create an IAM Role with:
+### Create an IAM Role with permissions for
+- VPC access
+- RDS connectivity
+- CloudWatch logs
 
-VPC access
+### Create an EventBridge rule to trigger Lambda every 1 minute
+- Schedule expression: `rate(1 minute)`
 
-RDS connectivity
+### Monitor data
+- Use pgAdmin, DBeaver, or any SQL client.
 
-CloudWatch logs
+---
 
-Create EventBridge rule to trigger Lambda every 1 minute
+### 📊 Screenshots / Diagram
+- **Folder:** `screenshots/`
+- Include architecture diagram.
+- Add example database output (e.g., screenshot from pgAdmin or DBeaver showing table data).
 
-Monitor and validate data using pgAdmin, DBeaver, or SQL client
+---
 
-📊 Screenshots / Diagram
-📁 Folder: screenshots/
-(Include architecture diagram and example database output)
+### 🧪 Learnings / Highlights
+- Built a fully secure VPC-based serverless app in AWS.
+- Used Lambda in a private subnet with NAT Gateway for outbound access.
+- Practiced IAM role assignment, NAT Gateway, and route table configuration.
+- Implemented automated ETL workflow using EventBridge + Lambda.
+- Gained hands-on experience in API integration with RDS PostgreSQL.
 
-🧪 Learnings / Highlights
-Built a fully secure VPC-based serverless app in AWS
 
-Used Lambda in private subnet with NAT Gateway for safe outbound API calls
 
-Practiced IAM role configuration, route tables, and NAT setup
-
-Automated ETL workflow using EventBridge + Lambda
-
-Gained real-world experience in RDS + Lambda + API Integration
-
-📎 Related Files
-lambda_function.py – Full Lambda source code
-
-rds_schema.sql – Optional SQL table creation script
-
-architecture.png – VPC architecture image (add in your repo)
